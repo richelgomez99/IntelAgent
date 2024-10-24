@@ -98,6 +98,12 @@ def filter_recent_jobs(jobs: List[Dict[str, Any]], days: int = 30) -> List[Dict[
                 location = job.get('location', {})
                 location_name = location.get('name', 'N/A')
                 
+                # Extract job description/content (Greenhouse provides this with content=true)
+                job_content = job.get('content', '')
+                description = ''
+                if job_content:
+                    description = job_content.strip()[:2000]  # Keep first 2000 chars for analysis
+                
                 recent_jobs.append({
                     'job_id': str(job.get('id', '')),
                     'title': job.get('title', 'N/A'),
@@ -105,6 +111,7 @@ def filter_recent_jobs(jobs: List[Dict[str, Any]], days: int = 30) -> List[Dict[
                     'location': location_name,
                     'posted_date': updated_at,
                     'url': job.get('absolute_url', ''),
+                    'description': description  # Full job description for AI analysis
                 })
         except (ValueError, TypeError):
             # Skip jobs with invalid dates
@@ -290,8 +297,9 @@ def job_scraper(request):
                 
                 all_jobs.extend(recent_jobs)
                 results_by_company[comp] = {
+                    'company': comp,
                     'job_count': len(recent_jobs),
-                    'recent_jobs': recent_jobs[:10],  # Limit for response size
+                    'recent_jobs': recent_jobs,  # Return ALL jobs for comprehensive analysis
                     'insights': insights
                 }
                 

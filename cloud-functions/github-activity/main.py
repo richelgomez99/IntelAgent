@@ -138,14 +138,30 @@ def list_organization_repos(organization: str, token: Optional[str]) -> List[Dic
             break
         
         for repo in data:
+            # Fetch README for high-value repos (stars > 100) to conserve API calls
+            readme_content = ''
+            if repo.get('stargazers_count', 0) > 100:
+                try:
+                    readme_url = f"https://api.github.com/repos/{repo.get('full_name')}/readme"
+                    readme_response = requests.get(readme_url, headers=headers, timeout=5)
+                    if readme_response.status_code == 200:
+                        readme_data = readme_response.json()
+                        # README content is base64 encoded
+                        import base64
+                        readme_content = base64.b64decode(readme_data.get('content', '')).decode('utf-8')[:3000]  # First 3000 chars
+                except Exception as e:
+                    logger.debug(f"Could not fetch README for {repo.get('name')}: {e}")
+            
             repos.append({
                 'name': repo.get('name', 'Unknown'),
                 'full_name': repo.get('full_name', ''),
-                'description': (repo.get('description') or '')[:200],  # Handle None properly
+                'description': (repo.get('description') or '')[:500],  # Longer description
+                'readme': readme_content,  # README content for strategic repos
                 'stars': repo.get('stargazers_count', 0),
                 'forks': repo.get('forks_count', 0),
                 'watchers': repo.get('watchers_count', 0),
                 'language': repo.get('language') or 'Unknown',
+                'topics': repo.get('topics', []),  # GitHub topics/tags
                 'created_at': repo.get('created_at', ''),
                 'updated_at': repo.get('updated_at', ''),
                 'url': repo.get('html_url', '')

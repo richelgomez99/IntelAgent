@@ -67,12 +67,16 @@ def search_google_news(query: str, days_back: int = 7) -> List[Dict[str, Any]]:
             # Extract sentiment
             sentiment = analyze_sentiment(entry.title + ' ' + entry.get('summary', ''))
             
+            # Get full summary/description from feed
+            full_summary = entry.get('summary', '')
+            
             articles.append({
                 'title': entry.get('title', 'N/A'),
                 'source': source,
                 'url': entry.get('link', ''),
                 'published_date': pub_date.isoformat() if pub_date else datetime.utcnow().isoformat(),
-                'snippet': entry.get('summary', '')[:300],  # Truncate
+                'snippet': full_summary[:300],  # Short preview
+                'content': full_summary[:2000],  # Longer content for analysis
                 'sentiment': sentiment
             })
     
