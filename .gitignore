@@ -39,3 +39,8 @@ SYSTEM_STATUS.md
 UI_IMPROVEMENTS.md
 GIT_PUSH_GUIDE.md
 *report*.md
+# Documentation files (keep only README.md)
+*.md
+!README.md
+*.txt
+!requirements.txt
