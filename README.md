@@ -72,7 +72,12 @@ gcloud run deploy patent-tracker --image gcr.io/PROJECT_ID/patent-tracker-app
 
 ## Demo
 
-Live app: [URL_HERE]
+**Live App**: https://patent-tracker-976989040085.us-central1.run.app
+
+Try these queries:
+- "Analyze Anthropic's strategic direction"
+- "Compare OpenAI and Anthropic's GitHub presence"
+- "What does Anthropic's hiring pattern reveal about their roadmap?"
 
 ## Development Notes
 
