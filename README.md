@@ -1,12 +1,13 @@
-# 🔍 Competitive Intelligence Platform
-## AI-Powered Strategic Analysis using Google Cloud & Gemini
+# 🔍 IntelAgent - Competitive Intelligence Platform
+## AI-Powered Strategic Analysis using Google Cloud, Gemini & Fivetran
 
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com)
+[![Fivetran](https://img.shields.io/badge/Fivetran-FF6B35?logo=fivetran&logoColor=white)](https://fivetran.com)
 [![Gemini 2.5 Pro](https://img.shields.io/badge/Gemini%202.5%20Pro-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/gemini-api)
 [![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Hackathon Project**: Google Cloud AI Hackathon 2025
+**Hackathon Project**: Google Cloud AI Hackathon 2025 + Fivetran Challenge
 
 **Live Demo**: [https://patent-tracker-976989040085.us-central1.run.app](https://patent-tracker-976989040085.us-central1.run.app)
 
@@ -47,9 +48,9 @@ A **fully autonomous AI agent** that:
 4. **Predicts** future moves with 30/60/90-day forecasts
 
 **Built entirely on Google Cloud** with Gemini 2.5 Pro orchestrating intelligent analysis across:
-- 📜 **BigQuery Patents Public Dataset** - R&D focus and IP strategy
+- 📜 **BigQuery Patents Public Dataset** - R&D focus and IP strategy (enriched via **Fivetran custom connector**)
 - 👥 **Job Postings** (Cloud Functions + Firestore) - Hiring patterns and org priorities
-- �� **News Coverage** (Cloud Functions + Firestore) - Public narrative and partnerships
+- 📰 **News Coverage** (Cloud Functions + Firestore) - Public narrative and partnerships
 - 💻 **GitHub Activity** (Cloud Functions + Firestore) - Developer ecosystem strategy
 
 ---
@@ -142,13 +143,18 @@ Let me begin the data collection...
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────────┐         ┌──────────────────┐         │
-│  │  BigQuery        │         │  Cloud Functions │         │
-│  │  Patents Public  │         │  (Gen 2)         │         │
-│  │  Dataset         │         │                  │         │
-│  │  • 100M+ patents │         │  • job-scraper   │         │
-│  │  • Global data   │         │  • news-search   │         │
-│  └────────┬─────────┘         │  • github-activity│        │
-│           │                   └────────┬─────────┘         │
+│  │  Fivetran        │         │  Cloud Functions │         │
+│  │  Custom Connector│ ──────> │  (Gen 2)         │         │
+│  │  • USPTO Patents │         │                  │         │
+│  └────────┬─────────┘         │  • job-scraper   │         │
+│           │                   │  • news-search   │         │
+│           ▼                   │  • github-activity│        │
+│  ┌──────────────────┐         └────────┬─────────┘         │
+│  │  BigQuery        │                  │                   │
+│  │  Patents Dataset │                  │                   │
+│  │  • Recent patents│                  │                   │
+│  │  • 100M+ archive │                  │                   │
+│  └────────┬─────────┘                  │                   │
 │           │                            │                    │
 │           ├────────────────────────────┤                    │
 │           │                            │                    │
@@ -182,25 +188,66 @@ Let me begin the data collection...
 
 ### Data Flow
 
-1. **Cloud Functions** (scheduled via Cloud Scheduler):
+1. **Fivetran Custom Connector** (scheduled sync):
+   - Fetches USPTO patents via Google Patents API
+   - Syncs to BigQuery `patent_intelligence` dataset
+   - UPSERT operations for deduplication
+   - Enriches BigQuery Patents Public Dataset with recent filings
+
+2. **Cloud Functions** (scheduled via Cloud Scheduler):
    - `job-scraper`: Fetches job postings → Firestore
    - `news-search`: Aggregates news articles → Firestore
    - `github-activity`: Tracks repositories → Firestore
 
-2. **User Query** → Streamlit App:
+3. **User Query** → Streamlit App:
    - Receives natural language question
    - Passes to Gemini 2.5 Pro with tool definitions
 
-3. **Gemini Agent**:
+4. **Gemini Agent**:
    - Analyzes query → Decides which tools to call
    - Executes `get_patents()`, `get_jobs()`, `get_news()`, `get_github()`
    - Receives results → Analyzes patterns
    - Generates strategic report
 
-4. **Output**:
+5. **Output**:
    - Executive summary
    - Detailed analysis (tabbed interface)
    - Evidence-based predictions
+
+---
+
+## 🔄 Why Fivetran?
+
+### The Patent Data Challenge
+
+**Problem**: BigQuery Patents Public Dataset has a **1-3 month sync lag** for recent USPTO filings. This creates a blind spot for the most recent competitive intelligence signals.
+
+**Solution**: **Fivetran Custom Connector** bridges this gap by:
+
+1. **Real-Time USPTO Data Access**
+   - Fetches patents directly from Google Patents API
+   - Zero lag for recent filings (filed within last 30 days)
+   - Supplements BigQuery's historical archive
+
+2. **Automated Data Pipeline**
+   - Scheduled syncs (daily/hourly)
+   - UPSERT operations prevent duplicates
+   - Automatic schema mapping to BigQuery format
+
+3. **Seamless Integration**
+   - Writes to BigQuery `patent_intelligence` dataset
+   - Same query interface as Patents Public Dataset
+   - Agent queries both datasets transparently
+
+### Business Value
+
+| Scenario | Without Fivetran | With Fivetran |
+|----------|------------------|---------------|
+| **Anthropic files patent on AI agents** | Detected 60-90 days later | Detected same day |
+| **Competitor pivot detection** | Missed early signals | Caught immediately |
+| **Prediction accuracy** | Based on stale data | Based on current filings |
+
+**Real Example**: Anthropic's 6 recent patents (2024-2025) are **not yet in BigQuery Public Dataset** due to sync lag. Fivetran connector fetches them directly from USPTO, enabling real-time strategic analysis.
 
 ---
 
@@ -304,6 +351,7 @@ due to data scarcity (LOW confidence forecasts)."
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **AI Model** | Gemini 2.5 Pro (Vertex AI) | Agent orchestration, reasoning, synthesis |
+| **Data Pipeline** | Fivetran Custom Connector | USPTO patent data sync to BigQuery |
 | **Compute** | Cloud Run | Serverless Streamlit app hosting |
 | **Serverless Functions** | Cloud Functions Gen 2 | Data collection (Jobs, News, GitHub) |
 | **Database (NoSQL)** | Firestore | Multi-source data storage |
@@ -317,13 +365,14 @@ due to data scarcity (LOW confidence forecasts)."
 ### Google Cloud Services Used
 
 1. **Vertex AI (Gemini 2.5 Pro)** - Core intelligence
-2. **Cloud Run** - App hosting
-3. **Cloud Functions Gen 2** - Data collectors
-4. **Firestore** - Data storage
-5. **BigQuery** - Patent dataset
-6. **Cloud Scheduler** - Automation
-7. **Cloud Build** - CI/CD
-8. **Artifact Registry** - Container storage
+2. **Fivetran** - Custom connector for USPTO patent data pipeline
+3. **Cloud Run** - App hosting
+4. **Cloud Functions Gen 2** - Data collectors
+5. **Firestore** - Data storage
+6. **BigQuery** - Patent dataset
+7. **Cloud Scheduler** - Automation
+8. **Cloud Build** - CI/CD
+9. **Artifact Registry** - Container storage
 
 ---
 
@@ -370,10 +419,18 @@ gcloud run deploy patent-tracker \
 
 ### Configuration
 
-1. **Enable Vertex AI** in Google Cloud Console
-2. **Request Gemini 2.5 Pro access** (if needed)
-3. **Set up Cloud Scheduler** for automated data collection
-4. **Configure Firestore** collections: `jobs`, `news`, `github`
+1. **Set up Fivetran Custom Connector** (optional - for real-time USPTO patents):
+   ```bash
+   cd fivetran-connector
+   # Package connector
+   zip -r connector.zip connector.py configuration.json requirements.txt
+   # Upload to Fivetran dashboard and configure BigQuery destination
+   ```
+
+2. **Enable Vertex AI** in Google Cloud Console
+3. **Request Gemini 2.5 Pro access** (if needed)
+4. **Set up Cloud Scheduler** for automated data collection
+5. **Configure Firestore** collections: `jobs`, `news`, `github`
 
 ### Usage
 
