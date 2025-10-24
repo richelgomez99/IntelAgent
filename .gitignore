@@ -31,7 +31,11 @@ service-account-key.json
 .DS_Store
 Thumbs.db
 
-# Internal tracking files (per hackathon requirements)
+# Internal tracking files and documentation
 tasks.md
 plan.md
 issues_log.md
+SYSTEM_STATUS.md
+UI_IMPROVEMENTS.md
+GIT_PUSH_GUIDE.md
+*report*.md
