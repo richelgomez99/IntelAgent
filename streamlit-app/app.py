@@ -6,7 +6,15 @@ import streamlit as st
 from gemini_agent import run_agent, run_agent_streaming
 from format_response import format_strategic_response
 from export import generate_markdown_report, generate_html_report, generate_json_export
-from components import metrics_dashboard, follow_up_button, section_header, tool_call_summary_card
+from components import (
+    metrics_dashboard, 
+    follow_up_button, 
+    section_header, 
+    tool_call_summary_card,
+    tool_results_card_enhanced,
+    reasoning_timeline
+)
+from visualizations import display_enhanced_metrics_with_charts
 import json
 import os
 from datetime import datetime
@@ -247,25 +255,8 @@ if len(st.session_state.messages) == 0:
     
     for idx, question in enumerate(questions):
         with col1 if idx % 2 == 0 else col2:
-            # Custom styled button using markdown
-            button_html = f"""
-            <div style="margin-bottom: 0.8rem;">
-                <div style="
-                    background: white;
-                    padding: 1rem;
-                    border-radius: 8px;
-                    border: 2px solid #E0E0E0;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                ">
-                    <div style="color: #1E88E5; font-weight: 600; font-size: 0.9rem;">
-                        💬 {question}
-                    </div>
-                </div>
-            </div>
-            """
-            if st.button(question, key=f"quick_{idx}", use_container_width=True):
+            # Clickable button
+            if st.button(f"💬 {question}", key=f"quick_{idx}", use_container_width=True, type="secondary"):
                 st.session_state.quick_query = question
                 st.rerun()
     
@@ -353,41 +344,16 @@ if user_input:
                 st.error(response)
                 tool_calls = []
         
-        # Display tool calls summary OUTSIDE the status component to avoid nesting
+        # Display tool calls summary with enhanced visualization
         if 'tool_calls' in locals() and tool_calls:
-            with st.expander(f"🛠️ **Tool Calls & Data Sources** ({len(tool_calls)} calls made)", expanded=False):
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Data Sources Used", len(tool_calls))
-                with col2:
-                    total_items = sum(call.get('result', {}).get('count', 0) for call in tool_calls)
-                    st.metric("Total Data Points", total_items)
-                with col3:
-                    sources = set(call['name'].replace('get_', '').title() for call in tool_calls)
-                    st.metric("Types", ", ".join(sources))
-                
-                st.divider()
-                
-                for j, call in enumerate(tool_calls, 1):
-                    st.markdown(f"### 📊 Call {j}: `{call['name'].replace('_', ' ').title()}`")
-                    st.markdown("**Parameters:**")
-                    st.json(call['args'], expanded=False)
-                    
-                    if 'result' in call:
-                        result_data = call['result']
-                        if 'summary' in result_data:
-                            st.success(f"**Summary:** {result_data['summary']}")
-                        if 'count' in result_data:
-                            st.caption(f"📈 Found {result_data['count']} items")
-                    
-                    if j < len(tool_calls):
-                        st.divider()
-            
             # Store for export
             st.session_state.last_response = response
             st.session_state.last_company = extract_company_name(user_input)
             
-            # Display metrics dashboard
+            # Enhanced tool results card with progress bars
+            tool_results_card_enhanced(tool_calls)
+            
+            # Display enhanced metrics with optional charts
             metrics = {}
             for call in tool_calls:
                 source = call['name'].replace('get_', '').title()
@@ -395,7 +361,12 @@ if user_input:
                 metrics[source] = count
             
             if metrics:
-                metrics_dashboard(metrics)
+                st.markdown("<br>", unsafe_allow_html=True)
+                try:
+                    display_enhanced_metrics_with_charts(metrics, tool_calls)
+                except Exception:
+                    # Fallback to simple metrics if charts fail
+                    metrics_dashboard(metrics)
                 st.markdown("<br>", unsafe_allow_html=True)
             
             # Display formatted response

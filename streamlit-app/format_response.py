@@ -8,7 +8,9 @@ from components import (
     section_header,
     insight_card,
     prediction_card,
-    confidence_badge
+    confidence_badge,
+    key_takeaways_card,
+    analysis_accordion_section
 )
 
 def format_strategic_response(response_text):
@@ -20,8 +22,11 @@ def format_strategic_response(response_text):
     # Try to identify sections in the response
     sections = parse_sections(response_text)
     
+    # Extract key takeaways from executive summary
+    takeaways = extract_key_takeaways(response_text)
+    
     if sections:
-        display_formatted_sections(sections)
+        display_formatted_sections(sections, takeaways)
     else:
         # Fallback to enhanced text display
         st.markdown(response_text)
@@ -49,12 +54,48 @@ def parse_sections(text):
     return sections if sections else None
 
 
-def display_formatted_sections(sections):
+def extract_key_takeaways(text: str) -> list:
+    """Extract key takeaways/insights from the response"""
+    takeaways = []
+    
+    # Look for bullet points or numbered insights
+    patterns = [
+        r'[-•▸]\s+([^\n]{30,150})',  # Bullet points with substantial content
+        r'\d+\.\s+([^\n]{30,150})',  # Numbered lists
+    ]
+    
+    for pattern in patterns:
+        matches = re.findall(pattern, text)
+        takeaways.extend([match.strip() for match in matches if len(match.strip()) > 30])
+    
+    # Also try to extract from specific sections like "Key Takeaways:"
+    takeaway_section = re.search(r'Key Takeaways:(.+?)(?=\n##|$)', text, re.DOTALL | re.IGNORECASE)
+    if takeaway_section:
+        content = takeaway_section.group(1)
+        lines = [line.strip(' -•▸') for line in content.split('\n') if line.strip() and len(line.strip()) > 20]
+        takeaways.extend(lines[:5])  # Limit to 5
+    
+    # Deduplicate and limit
+    seen = set()
+    unique_takeaways = []
+    for t in takeaways:
+        if t.lower() not in seen and len(unique_takeaways) < 6:
+            seen.add(t.lower())
+            unique_takeaways.append(t)
+    
+    return unique_takeaways
+
+
+def display_formatted_sections(sections, takeaways=None):
     """Display sections with beautiful formatting using custom components"""
     
     # Executive Summary at top - use custom card
     if 'executive_summary' in sections:
         executive_summary_card(sections['executive_summary'])
+        
+        # Display key takeaways if extracted
+        if takeaways:
+            key_takeaways_card(takeaways)
     
     # Strategic Reasoning - enhanced with tabs and cards
     if 'strategic_reasoning' in sections:

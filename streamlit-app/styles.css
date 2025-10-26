@@ -320,8 +320,39 @@ hr {
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes progressLoad {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
 [data-testid="stChatMessage"] {
     animation: slideIn 0.3s ease-out;
+}
+
+.stSpinner > div {
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* Code Blocks */
@@ -372,4 +403,178 @@ a:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-blue);
+}
+
+/* Enhanced Loading States */
+.stStatus[data-state="running"] {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Enhanced Card Hover Effects */
+[data-testid="stExpander"] {
+    transition: all 0.2s ease;
+}
+
+[data-testid="stExpander"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Progress Bar Animations */
+.progress-bar {
+    animation: progressLoad 1s ease-out;
+}
+
+/* Smooth Transitions for Interactive Elements */
+[data-testid="stMetricValue"],
+[data-testid="stMetricLabel"] {
+    transition: color 0.2s ease;
+}
+
+/* Enhanced Button States */
+.stButton button:not(:disabled):active {
+    transform: scale(0.98);
+}
+
+/* Skeleton Loader */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton-loader {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 0px,
+        #e0e0e0 40px,
+        #f0f0f0 80px
+    );
+    background-size: 1000px 100%;
+}
+
+/* Improved Focus States */
+*:focus-visible {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Better Text Selection */
+::selection {
+    background: rgba(30, 136, 229, 0.2);
+    color: var(--text-primary);
+}
+
+/* Improved Empty State Styling */
+.empty-state {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.empty-state:hover {
+    opacity: 1;
+}
+
+/* Loading Indicator Enhancement */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Micro-interactions for Cards */
+.card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Enhanced Gradient Backgrounds */
+.gradient-bg {
+    background: linear-gradient(
+        135deg,
+        rgba(30, 136, 229, 0.05) 0%,
+        rgba(124, 77, 255, 0.05) 100%
+    );
+    transition: background 0.3s ease;
+}
+
+/* Status Indicator Pulse */
+.status-active {
+    position: relative;
+}
+
+.status-active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Improved Tab Transitions */
+.stTabs [data-baseweb="tab"] {
+    transition: all 0.2s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(30, 136, 229, 0.05);
+}
+
+/* Enhanced Focus States for Chat Actions */
+.chat-action-btn:focus,
+.export-btn:focus,
+.citation-link:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .intel-card {
+    border: 2px solid var(--gray-800);
+  }
+
+  .progress-bar {
+    border: 1px solid var(--gray-800);
+  }
+
+  .timeline-step::before {
+    background: var(--gray-800);
+  }
+}
+
+/* Dark mode styles */
+[data-theme="dark"] .intel-card {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .chat-container {
+  background: var(--gray-100);
+}
+
+[data-theme="dark"] .chat-message.assistant {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .export-section {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
 }
