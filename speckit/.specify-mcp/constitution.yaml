@@ -1,0 +1,134 @@
+project:
+  name: IntelAgent - Competitive Intelligence Platform
+  type: web
+  description: AI-powered competitive intelligence platform using Gemini 2.5 Pro for
+    autonomous multi-source analysis (patents, jobs, news, GitHub)
+  version: 0.1.0
+workflow:
+  branch_prefix: feature
+  auto_commit: false
+  specs_directory: specs
+technical:
+  language: Python 3.11
+  framework: Streamlit + Cloud Functions
+  testing: pytest
+  build_tool: pip
+principles:
+  # 🔒 SECURITY - Non-Negotiable Security Standards
+  security:
+    - "IMMUTABLE: No hardcoded secrets (use GCP Secret Manager)"
+    - "IMMUTABLE: All Cloud Functions require authentication (IAM or API keys)"
+    - "IMMUTABLE: Parameterized queries only (prevent SQL injection)"
+    - "IMMUTABLE: Input validation on all user-facing endpoints"
+    - "IMMUTABLE: Firestore security rules deployed before production"
+    - "IMMUTABLE: CORS configured with allowed origins (no wildcards)"
+    - "IMMUTABLE: Rate limiting on all public endpoints"
+    - "IMMUTABLE: Regular dependency audits (pip-audit, safety)"
+  
+  # 🧪 TESTING - Testing Excellence Standards
+  testing:
+    - "IMMUTABLE: 80%+ test coverage required before merge"
+    - "IMMUTABLE: Unit tests for all business logic"
+    - "IMMUTABLE: Integration tests for Cloud Functions"
+    - "IMMUTABLE: E2E tests for critical user flows"
+    - "IMMUTABLE: Performance benchmarks for AI agent responses (<5s)"
+    - "IMMUTABLE: Mock external APIs (BigQuery, Firestore, Gemini)"
+    - "Test data factory for consistent fixtures"
+    - "Snapshot tests for AI response formats"
+  
+  # 🎨 UI/UX - User Experience Standards
+  ui_ux:
+    - "IMMUTABLE: WCAG 2.1 AA accessibility compliance"
+    - "IMMUTABLE: Mobile-responsive design (320px-4K)"
+    - "IMMUTABLE: Loading states for all async operations"
+    - "IMMUTABLE: Error boundaries with user-friendly messages"
+    - "IMMUTABLE: Skeleton loaders (no blank screens)"
+    - "IMMUTABLE: Keyboard navigation support"
+    - "Use Streamlit custom components for complex interactions"
+    - "Consistent design system (colors, typography, spacing)"
+    - "Progressive enhancement (work without JavaScript where possible)"
+  
+  # 🏗️ ARCHITECTURE - Code Quality Standards
+  architecture:
+    - "IMMUTABLE: Separation of concerns (UI / Business Logic / Data)"
+    - "IMMUTABLE: Type hints on all function signatures"
+    - "IMMUTABLE: Comprehensive docstrings (Google style)"
+    - "IMMUTABLE: No functions >50 lines, no files >500 lines"
+    - "IMMUTABLE: DRY principle (max 2 similar code blocks)"
+    - "IMMUTABLE: Configuration via environment variables"
+    - "Single Responsibility Principle for all classes/functions"
+    - "Dependency injection for testability"
+    - "Repository pattern for data access"
+  
+  # ⚡ PERFORMANCE - Performance Budgets
+  performance:
+    - "IMMUTABLE: AI agent response time <5s (P95)"
+    - "IMMUTABLE: Cloud Function cold start <3s"
+    - "IMMUTABLE: Firestore queries <500ms"
+    - "IMMUTABLE: BigQuery queries <2s"
+    - "IMMUTABLE: Streamlit page load <2s"
+    - "Implement response caching (30 min TTL)"
+    - "Pagination for large result sets (50 items/page)"
+    - "Lazy loading for heavy components"
+    - "Optimize Gemini prompts (minimize token usage)"
+  
+  # 📚 DOCUMENTATION - Documentation Requirements
+  documentation:
+    - "IMMUTABLE: README.md for every deployable component"
+    - "IMMUTABLE: API documentation (OpenAPI/Swagger)"
+    - "IMMUTABLE: Architecture diagrams (C4 model)"
+    - "IMMUTABLE: Deployment runbook with rollback procedures"
+    - "Inline code comments for complex logic"
+    - "User guide with screenshots"
+    - "Developer onboarding guide"
+    - "Incident response playbook"
+  
+  # 🚀 DEPLOYMENT - CI/CD Standards
+  deployment:
+    - "IMMUTABLE: Automated deployments (Cloud Build)"
+    - "IMMUTABLE: Zero-downtime deployments"
+    - "IMMUTABLE: Health checks on all services"
+    - "IMMUTABLE: Monitoring and alerting (Cloud Monitoring)"
+    - "IMMUTABLE: Centralized logging (Cloud Logging)"
+    - "Blue-green deployment for Streamlit app"
+    - "Feature flags for gradual rollouts"
+    - "Automated rollback on failure"
+  
+  # 🔍 OBSERVABILITY - Monitoring & Logging
+  observability:
+    - "IMMUTABLE: Structured logging (JSON format)"
+    - "IMMUTABLE: Request tracing (correlation IDs)"
+    - "IMMUTABLE: Error tracking (log errors with context)"
+    - "IMMUTABLE: Performance metrics (Cloud Monitoring)"
+    - "IMMUTABLE: Cost monitoring alerts"
+    - "Dashboard for key business metrics"
+    - "SLO/SLA tracking (99.5% uptime)"
+    - "User analytics (respecting privacy)"
+  
+  # 🛡️ DATA PRIVACY - Data Protection
+  data_privacy:
+    - "IMMUTABLE: No PII in logs or error messages"
+    - "IMMUTABLE: Data retention policies (90 days)"
+    - "IMMUTABLE: User consent for analytics"
+    - "IMMUTABLE: Data encryption at rest (Firestore default)"
+    - "IMMUTABLE: Data encryption in transit (HTTPS only)"
+    - "GDPR compliance considerations"
+    - "Right to deletion implementation"
+    - "Data minimization (collect only what's needed)"
+
+quality:
+  test_coverage_minimum: 80
+  documentation_required: true
+  linting_enabled: true
+  type_checking: true
+  code_review_required: true
+  max_function_lines: 50
+  max_file_lines: 500
+  max_complexity: 10
+team:
+  lead: TBD
+  reviewers: []
+metadata:
+  version: 1.0.0
+  created: '2025-11-17T11:39:02.329696'
+  last_modified: '2025-11-17T11:39:02.329696'

@@ -42,5 +42,8 @@ GIT_PUSH_GUIDE.md
 # Documentation files (keep only README.md)
 *.md
 !README.md
+!speckit/**/*.md
+!speckit/**/*.json
+!speckit/**/*.yaml
 *.txt
 !requirements.txt
